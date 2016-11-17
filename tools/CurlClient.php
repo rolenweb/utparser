@@ -95,6 +95,7 @@ class CurlClient implements ClientInterface
 		curl_setopt($this->curl, CURLOPT_TIMEOUT, $this->timeout);
 		curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true); // Follow redirects
 		curl_setopt($this->curl, CURLOPT_COOKIEJAR, $ckfile);
+		curl_setopt($this->curl, CURLOPT_COOKIEFILE, $ckfile);
 		curl_setopt($this->curl, CURLOPT_USERAGENT, $useragent);
 		if ($type === 'socks5') {
 
