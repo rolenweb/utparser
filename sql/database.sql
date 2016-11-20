@@ -23,6 +23,7 @@ CREATE TABLE `catalog` (
 CREATE TABLE `product` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `url` text DEFAULT NULL,
+  `art` int(11) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `status` ENUM(  'parsed',  'posted' ) NULL DEFAULT 'parsed',
   `catalog_id` int(11) DEFAULT NULL,

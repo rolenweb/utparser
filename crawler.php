@@ -10,11 +10,12 @@ use Simplon\Mysql\Mysql;
 
 
 for (;;){ 
-	$link = connectDb()->fetchRow('SELECT * FROM link WHERE status != :status LIMIT 1',[':status' => 'parsed']);
+	$link = connectDb()->fetchRow('SELECT * FROM link WHERE status != :status and type = :type LIMIT 1',[':status' => 'crawled',':type' => 'product']);
+
 	if (empty($link) === false) {
 		parsingLink($link);
 	}else{
-		error('There are not link for parsing');
+		error('There are not product for crawling');
 	}
 	
 }
@@ -22,7 +23,6 @@ for (;;){
 function parsingLink($link)
 {
 	//$link['url'] = 'http://thelabels.ulmart.ru/fashion/goods/16?rootCategory=97375';
-	
 	if (empty($link['url'])) {
 		error('Url is null');
 		return;
@@ -31,26 +31,22 @@ function parsingLink($link)
 		error('Type is null');
 		return;
 	}
+	info('Parsing url: '.$link['url']);
 	$client = new CurlClient();
 	$content = $client->parsePage($link['url']);
 
 	if (empty($content)) {
 		error('Content is null');
-		//return;
+		return;
 	}
-	
+
 	if (parse_url($link['url'])['host'] === 'thelabels.ulmart.ru') {
 		//collectionLinkThelabels($client, $content, $link['url']);
 	}else{
-		$colection = collectionLink($client, $content, $link['url']);
-		
+		//$colection = collectionLink($client, $content, $link['url']);
+		parsePropertyProduct($client, $content, $link);
 	}
-	$catalog = saveCatalog($client, $content, $link);
-	
-	
-
 	changeStatusLink($link);
-	
 	
 }
 
@@ -61,7 +57,7 @@ function collectionLink($client, $content, $url)
 	if (empty($links_catalog) === false) {
 		info('Found '.count($links_catalog) .' links for catalog');
 		foreach ($links_catalog as $link) {
-			if (connectDb()->fetchColumn('SELECT id FROM link WHERE url = :url and type = :catalog', array(':url' => trim($link),'catalog' => 'catalog')) === null)
+			if (connectDb()->fetchColumn('SELECT id FROM link WHERE url = :url and type = :catalog', array('url' => trim($link),'catalog' => 'catalog')) === null)
 			{
 				$data[0] = [
 					'url' => $link,
@@ -98,7 +94,7 @@ function collectionLink($client, $content, $url)
 				insertTable('link',$data);
 				info($fix_link. ' is saved');
 			}else{
-				//info($link. ' is already saving');
+				//info($fix_link. ' is already saving');
 			}
 		}
 		
@@ -193,11 +189,10 @@ function saveCatalog($client, $content, $link)
 				}
 			}
 			if ($n === 0) {
-				$catalog = connectDb()->fetchColumnMany('SELECT id FROM catalog WHERE title = :title and parent_id is null', array('title' => trim($name)));
+				$catalog = connectDb()->fetchColumnMany('SELECT id FROM catalog WHERE title = :title and parent_id is null', array(':title' => trim($name)));
 			}else{
-				$catalog = connectDb()->fetchColumnMany('SELECT id FROM catalog WHERE title = :title and parent_id = :parent', array('title' => trim($name),':parent' => $parent_id));
+				$catalog = connectDb()->fetchColumnMany('SELECT id FROM catalog WHERE title = :title and parent_id = :parent', array(':title' => trim($name),':parent' => $parent_id));
 			}
-			
 			
 			if ($catalog === null)
 			{
@@ -211,11 +206,11 @@ function saveCatalog($client, $content, $link)
 				$catalog = insertTable('catalog',$data);
 				info($name. ' is saved');
 			}else{
-				info($name. ' is already saving');
+				//info($name. ' is already saving');
 			}
 			$parent_id = (empty($catalog[0]) === false) ? $catalog[0] : null;
 		}
-		
+		return $catalog;
 	}else{
 		error('There are not names for catalog');
 	}
@@ -223,20 +218,141 @@ function saveCatalog($client, $content, $link)
 	//die;
 }
 
+function parsePropertyProduct($client, $content, $link)
+{
+
+	$catalog = saveCatalog($client, $content, $link);
+
+	//collectionLink($client, $content, $link['url']);
+
+	if (empty($catalog[0])) {
+		error('Catalog id is not found');
+		return;
+	}
+
+	$properties =  connectDb()->fetchRowMany('SELECT * FROM property_setting WHERE type = :type', array(':type' => 'product'));
+
+	if (empty($properties)) {
+		error('The property is null');
+	}
+
+	$title = $client->parseProperty($content,'string',$properties[0]['value'],null,null);
+
+	$art = $client->parseProperty($content,'string',$properties[1]['value'],null,null);
+
+	if (empty(trim($art[0]))) {
+		error('The art is not found');
+		return;
+	}
+	
+	if (connectDb()->fetchColumn('SELECT id FROM product WHERE art = :art', array(':art' => trim($art[0]))) === null)
+	{
+
+		$data[0] = [
+			'url' => $link['url'],
+			'art' => trim($art[0]),
+			'title' => trim($title[0]),
+			'catalog_id' => $catalog[0],
+			'status' => 'parsed',
+			'created_at' => time(),
+			'updated_at' => time(),
+		];
+		$product = insertTable('product',$data);
+		info($art[0]. ' is saved');
+		if (empty($product[0]) === false) {
+			foreach ($properties as $property) {
+				switch ($property['title']) {
+					
+					case 'description':
+						$description = $client->parseProperty($content,'string',$property['value'],null,null);
+						saveProperty($description,$product[0],$property['id']);
+						
+						break;
+
+					case 'price':
+						$price = $client->parseProperty($content,'attribute',$property['value'],null,'content');
+						saveProperty($price,$product[0],$property['id']);
+						break;
+
+					case 'currency':
+						$currency = $client->parseProperty($content,'attribute',$property['value'],null,'content');
+						saveProperty($currency,$product[0],$property['id']);
+						break;
+
+					case 'bigimage':
+						$bigimage = $client->parseProperty($content,'attribute',$property['value'],null,'src');
+						saveProperty($bigimage,$product[0],$property['id']);
+						break;
+
+					case 'smallimage':
+						$smallimage = $client->parseProperty($content,'attribute',$property['value'],null,'src');
+						saveProperty($smallimage,$product[0],$property['id']);
+						break;
+
+					case 'property_title':
+						$property_title = $client->parseProperty($content,'string',$property['value'],null,null);
+						saveProperty($property_title,$product[0],$property['id']);
+						break;
+
+					case 'property_value':
+						$property_value = $client->parseProperty($content,'string',$property['value'],null,null);
+						saveProperty($property_value,$product[0],$property['id']);
+						break;
+
+					case 'property_full_title':
+						$property_full_title = $client->parseProperty($content,'string',$property['value'],null,null);
+						saveProperty($property_full_title,$product[0],$property['id']);
+						break;
+
+					case 'property_full_value':
+						$property_full_value = $client->parseProperty($content,'string',$property['value'],null,null);
+						saveProperty($property_full_value,$product[0],$property['id']);
+						break;
+					
+					default:
+						# code...
+						break;
+				}
+			}
+		}
+
+	}else{
+		info($art[0]. ' is already parsed');
+	}
+
+	
+	
+}
+
+function saveProperty($properties,$pid,$propid)
+{
+	if (empty($properties) === false) {
+		foreach ($properties as $property) {
+			$data[0] = [
+				'object_id' => $pid,
+				'property_id' => $propid,
+				'value' => rtrim($property),
+				'created_at' => time(),
+				'updated_at' => time(),
+			];
+			insertTable('property',$data);
+			//info($property.' is saved');
+		}
+	}else{
+		error('Properties are null');
+	}
+}
+
 function changeStatusLink($link)
 {
-	if ($link['status'] === 'wating') {
-		$condr = [
-			'id' => $link['id'],		
-		];
-		$data = [
-			'status' => 'parsed',
-		];
-		updateTable('link', $condr, $data);
-		
-	}
-	info($link['url'].' is parsed');
-	
+	$condr = [
+		'id' => $link['id'],		
+	];
+	$data = [
+		'status' => 'crawled',
+	];
+	updateTable('link', $condr, $data);
+	info($link['url'].' is crawled');
 }
 
 //database
