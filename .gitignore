@@ -1,5 +1,6 @@
 composer.phar
 composer.lock
+nohup.out
 /config/db.php
 /config/antigate.php
 /runtime/
