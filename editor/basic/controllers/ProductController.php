@@ -8,6 +8,7 @@ use app\models\ProductSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Html;
 
 /**
  * ProductController implements the CRUD actions for Product model.
@@ -51,8 +52,115 @@ class ProductController extends Controller
      */
     public function actionView($id)
     {
+        $product = $this->findModel($id);
+
+        $properties = $product->properties;
+        $prop_grid_view = [];
+        $attributes = [
+            'id',
+            'url:url',
+            'art',
+            'title',
+            'status',
+            [
+                'label' => 'Catalog',
+                'value' => $product->catalog->title,
+            ],
+                        
+            
+            
+        ];
+        if (empty($properties) === false) {
+            foreach ($properties as $property) {
+                switch ($property->propertyName->title) {
+                    case 'description':
+                        array_push($attributes,
+                            [
+                                'label' => 'Description',
+                                'value' => $property->value,
+                            ]);
+                        break;
+
+                    case 'price':
+                        array_push($attributes,
+                            [
+                                'label' => 'Price',
+                                'value' => $property->value,
+                            ]);
+                        break;
+
+                    case 'currency':
+                        array_push($attributes,
+                            [
+                                'label' => 'Currency',
+                                'value' => $property->value,
+                            ]);
+                        break;
+
+                    case 'bigimage':
+                        array_push($attributes,
+                            [
+                                'label' => 'Big image',
+                                'format' => 'raw',
+                                'value' => Html::img($property->value),
+                            ]);
+                        break;
+
+                    case 'smallimage':
+                        array_push($attributes,
+                            [
+                                'label' => 'Small image',
+                                'format' => 'raw',
+                                'value' => Html::img($property->value),
+                            ]);
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }
+            }
+        }
+
+        $full_property = $product->fullProperty();
+        if (empty($full_property) === false) {
+            foreach ($full_property as $item) {
+                array_push($attributes,
+                            [
+                                'label' => $item['name'],
+                                'value' => $item['value'],
+                            ]);
+            }
+        }else{
+            $short_property = $product->shortProperty();
+            if (empty($short_property) === false) {
+                foreach ($short_property as $item) {
+                    array_push($attributes,
+                                [
+                                    'label' => $item['name'],
+                                    'value' => $item['value'],
+                                ]);
+                }
+            }    
+        }
+
+        
+
+        
+
+        array_push($attributes,[
+                'label' => 'Created',
+                'value' => date("Y-m-d H:i:s",$product->created_at),
+            ],
+            [
+                'label' => 'Update',
+                'value' => date("Y-m-d H:i:s",$product->updated_at),
+            ]);
+        //var_dump($attributes);
+        //die;
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $product,
+            'attributes' => $attributes,
         ]);
     }
 

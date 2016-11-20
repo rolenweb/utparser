@@ -4,6 +4,8 @@ namespace app\models;
 
 use Yii;
 
+use app\models\Property;
+
 /**
  * This is the model class for table "product".
  *
@@ -54,4 +56,88 @@ class Product extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+
+    public function getCatalog()
+    {
+        return $this->hasOne(Catalog::className(), ['id' => 'catalog_id']);
+    }
+
+    public function getProperties()
+    {
+        return $this->hasMany(Property::className(), ['object_id' => 'id']);
+    }
+
+    
+    public function shortProperty()
+    {
+        $out = [];
+        $list_name = Property::find()->joinWith(['propertyName'])->where([
+                'and',
+                    [
+                        'property.object_id' => $this->id,
+                    ],
+                    [
+                        'property_setting.title' => 'property_title'
+                    ],
+            ])->all();
+
+        $list_value = Property::find()->joinWith(['propertyName'])->where([
+                'and',
+                    [
+                        'property.object_id' => $this->id,
+                    ],
+                    [
+                        'property_setting.title' => 'property_value'
+                    ],
+            ])->all();
+
+        if (empty($list_name)) {
+            return $out;
+        }
+        foreach ($list_name as $n_name => $name) {
+            $out[] = [
+                'name' => $name->value,
+                'value' => (empty($list_value[$n_name]->value) === false) ? trim($list_value[$n_name]->value) : null,
+                
+            ];
+        }
+        return $out;
+    }
+
+    public function fullProperty()
+    {
+        $out = [];
+        $list_name = Property::find()->joinWith(['propertyName'])->where([
+                'and',
+                    [
+                        'property.object_id' => $this->id,
+                    ],
+                    [
+                        'property_setting.title' => 'property_full_title'
+                    ],
+            ])->all();
+
+        $list_value = Property::find()->joinWith(['propertyName'])->where([
+                'and',
+                    [
+                        'property.object_id' => $this->id,
+                    ],
+                    [
+                        'property_setting.title' => 'property_full_value'
+                    ],
+            ])->all();
+
+        if (empty($list_name)) {
+            return $out;
+        }
+        foreach ($list_name as $n_name => $name) {
+            $out[] = [
+                'name' => $name->value,
+                'value' => (empty($list_value[$n_name]->value) === false) ? trim($list_value[$n_name]->value) : null,
+                
+            ];
+        }
+        return $out;
+    }
+
 }

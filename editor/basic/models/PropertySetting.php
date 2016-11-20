@@ -50,4 +50,9 @@ class PropertySetting extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+
+    public function getProperties()
+    {
+        return $this->hasMany(Property::className(), ['property_id' => 'id']);
+    }
 }

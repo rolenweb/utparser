@@ -75,29 +75,45 @@ class SiteController extends Controller
                     
                 if (empty($catalog->childs)) {
                     $menu[$c1]['label'] = $catalog->title;    
-                    $menu[$c1]['url'] = Url::to(['site/catalog','id' => $catalog->id]);
+                    $menu[$c1]['url'] = Url::to(['product/index','ProductSearch[catalog_id]' => $catalog->id]);
                 }else{
                     foreach ($catalog->childs as $c2 => $catalog2) {
                         $menu[$c1]['label'] = $catalog->title;
                         if (empty($catalog2->childs)) {
                             $menu[$c1]['items'][$c2]['label'] =  $catalog2->title;
-                            $menu[$c1]['items'][$c2]['url'] =  Url::to(['site/catalog','id' => $catalog2->id]);
+                            $menu[$c1]['items'][$c2]['url'] =  Url::to(['product/index','ProductSearch[catalog_id]' => $catalog2->id]);
                         }else{
                             foreach ($catalog2->childs as $c3 => $catalog3) {
                                 $menu[$c1]['items'][$c2]['label'] =  $catalog2->title;
                                 if (empty($catalog3->childs)) {
                                     $menu[$c1]['items'][$c2]['items'][$c3]['label'] =  $catalog3->title;
-                                    $menu[$c1]['items'][$c2]['items'][$c3]['url'] =  Url::to(['site/catalog','id' => $catalog3->id]);
+                                    $menu[$c1]['items'][$c2]['items'][$c3]['url'] =  Url::to(['product/index','ProductSearch[catalog_id]' => $catalog3->id]);
                                 }else{
                                     $menu[$c1]['items'][$c2]['items'][$c3]['label'] =  $catalog3->title;
                                     foreach ($catalog3->childs as $c4 => $catalog4) {
                                         $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['label'] =  $catalog4->title;
                                         if (empty($catalog4->childs)) {
                                             $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['label'] =  $catalog4->title;
-                                            $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['url'] =  Url::to(['site/catalog','id' => $catalog4->id]);
+                                            $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['url'] =  Url::to(['product/index','ProductSearch[catalog_id]' => $catalog4->id]);
                                         }else{
                                             foreach ($catalog4->childs as $c5 => $catalog5) {
                                                 $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['items'][$c5]['label'] =  $catalog5->title;
+                                                if (empty($catalog5->childs)) {
+                                                    $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['items'][$c5]['label'] =  $catalog5->title;
+                                                    $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['items'][$c5]['url'] =  Url::to(['product/index','ProductSearch[catalog_id]' => $catalog5->id]);
+                                                }else{
+                                                    foreach ($catalog5->childs as $c6 => $catalog6) {
+                                                        $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['items'][$c5]['items'][$c6]['label'] =  $catalog6->title;
+                                                        if (empty($catalog6->childs)) {
+                                                            $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['items'][$c5]['items'][$c6]['label'] =  $catalog6->title;
+                                                            $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['items'][$c5]['items'][$c6]['url'] =  Url::to(['product/index','ProductSearch[catalog_id]' => $catalog6->id]);
+                                                        }else{
+                                                            foreach ($catalog6->childs as $c7 => $catalog7) {
+                                                                $menu[$c1]['items'][$c2]['items'][$c3]['items'][$c4]['items'][$c5]['items'][$c6]['items'][$c7]['label'] =  $catalog7->title;
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }   
                                     }

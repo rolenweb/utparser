@@ -49,4 +49,14 @@ class Property extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+
+    public function getPropertyName()
+    {
+        return $this->hasOne(PropertySetting::className(), ['id' => 'property_id']);
+    }
+
+    public function getProduct()
+    {
+        return $this->hasOne(Product::className(), ['id' => 'object_id']);
+    }
 }
