@@ -54,7 +54,7 @@ function collectionLink($client, $content, $url)
 {
 	info('The collection of links on the page: '.$url);
 	$links_catalog = $client->parseProperty($content,'link','a.js-gtm-click-menu',$url,null);
-	if (empty($links_catalog) === false) {
+	/*if (empty($links_catalog) === false) {
 		info('Found '.count($links_catalog) .' links for catalog');
 		foreach ($links_catalog as $link) {
 			if (connectDb()->fetchColumn('SELECT id FROM link WHERE url = :url and type = :catalog', array('url' => trim($link),'catalog' => 'catalog')) === null)
@@ -75,7 +75,7 @@ function collectionLink($client, $content, $url)
 	}else{
 		error('There are not link for catalog');
 	}
-
+	*/
 	$links_product = $client->parseProperty($content,'link','a.js-gtm-product-click',$url,null);
 	if (empty($links_product) === false) {
 		info('Found '.count($links_product) .' links for product');
@@ -223,7 +223,7 @@ function parsePropertyProduct($client, $content, $link)
 
 	$catalog = saveCatalog($client, $content, $link);
 
-	//collectionLink($client, $content, $link['url']);
+	collectionLink($client, $content, $link['url']);
 
 	if (empty($catalog[0])) {
 		error('Catalog id is not found');

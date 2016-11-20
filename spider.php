@@ -10,7 +10,7 @@ use Simplon\Mysql\Mysql;
 
 
 for (;;){ 
-	$link = connectDb()->fetchRow('SELECT * FROM link WHERE status != :status LIMIT 1',[':status' => 'parsed']);
+	$link = connectDb()->fetchRow('SELECT * FROM link WHERE status = :status LIMIT 1',[':status' => 'wating']);
 	if (empty($link) === false) {
 		parsingLink($link);
 	}else{
