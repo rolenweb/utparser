@@ -10,6 +10,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 use app\models\Catalog;
+use app\models\LoginForm;
 
 
 class SiteController extends Controller
