@@ -3,6 +3,7 @@ composer.lock
 nohup.out
 /config/db.php
 /config/antigate.php
+/config/setting.php
 /runtime/
 /cookiefile/
 /vendor/

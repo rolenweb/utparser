@@ -1,17 +1,20 @@
 CREATE TABLE `link` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `url` text DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
   `type` ENUM(  'catalog',  'product' ) DEFAULT NULL,
   `status` ENUM(  'wating',  'parsed', 'crawled' ) NULL DEFAULT 'wating',
   `created_at` int(11) DEFAULT NULL,
   `updated_at` int(11) DEFAULT NULL,
 
   PRIMARY KEY (`id`)
+
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8; 
+
+CREATE INDEX url_type ON link(url, type);
 
 CREATE TABLE `catalog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `url` text DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `parent_id` int(11) DEFAULT NULL,
   `created_at` int(11) DEFAULT NULL,
@@ -22,7 +25,7 @@ CREATE TABLE `catalog` (
 
 CREATE TABLE `product` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `url` text DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
   `art` int(11) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `status` ENUM(  'parsed',  'posted' ) NULL DEFAULT 'parsed',
@@ -32,6 +35,8 @@ CREATE TABLE `product` (
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8; 
+
+CREATE INDEX art ON product(art);
 
 
 CREATE TABLE `property_setting` (
