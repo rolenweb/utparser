@@ -34,7 +34,8 @@ function parsingLink($link)
 	info('Parsing url: '.$link['url']);
 	$client = new CurlClient();
 	$content = $client->parsePage($link['url']);
-
+	var_dump($content);
+	die;
 	if (empty($content)) {
 		error('Content is null');
 		return;
