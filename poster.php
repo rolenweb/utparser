@@ -69,13 +69,19 @@ function saveProduct($woocommerce,$product,$pid)
 function saveCatalog($woocommerce,$name,$pid = null)
 {
 	info($name.' checking...');
-	$out = $woocommerce->get('products/categories',[
+	try{
+		$out = $woocommerce->get('products/categories',[
 			'search' => $name,		
 			'parent' => (empty($pid) === false) ? $pid : 0,
-	]);
-	if (empty($out[0]) === false) {
-		return $out[0];
+		]);
+		if (empty($out[0]) === false) {
+			return $out[0];
+		}
+	}catch (HttpClientException $e) {
+		error($e->getMessage()); // Error message.
+	    return;
 	}
+	
 	
 	try {
 		$out = $woocommerce->post('products/categories', [

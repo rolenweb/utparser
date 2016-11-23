@@ -38,7 +38,6 @@ CREATE TABLE `product` (
 
 CREATE INDEX art ON product(art);
 
-
 CREATE TABLE `property_setting` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL,
