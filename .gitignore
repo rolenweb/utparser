@@ -1,6 +1,6 @@
 composer.phar
 composer.lock
-nohup.out
+*nohup.out
 /config/db.php
 /config/antigate.php
 /config/setting.php
