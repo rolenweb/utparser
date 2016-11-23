@@ -2,7 +2,7 @@ CREATE TABLE `link` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `url` varchar(255) DEFAULT NULL,
   `type` ENUM(  'catalog',  'product' ) DEFAULT NULL,
-  `status` ENUM(  'wating',  'parsed', 'crawled' ) NULL DEFAULT 'wating',
+  `status` ENUM(  'wating',  'parsed', 'crawled', 'error-crawled' ) NULL DEFAULT 'wating',
   `created_at` int(11) DEFAULT NULL,
   `updated_at` int(11) DEFAULT NULL,
 
@@ -28,7 +28,7 @@ CREATE TABLE `product` (
   `url` varchar(255) DEFAULT NULL,
   `art` int(11) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `status` ENUM(  'parsed',  'posted' ) NULL DEFAULT 'parsed',
+  `status` ENUM(  'parsed',  'posted', 'error' ) NULL DEFAULT 'parsed',
   `catalog_id` int(11) DEFAULT NULL,
   `created_at` int(11) DEFAULT NULL,
   `updated_at` int(11) DEFAULT NULL,

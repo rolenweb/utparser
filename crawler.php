@@ -10,8 +10,8 @@ use Simplon\Mysql\Mysql;
 
 
 for (;;){ 
-	$link = connectDb()->fetchRow('SELECT * FROM link WHERE status != :status and type = :type LIMIT 1',[':status' => 'crawled',':type' => 'product']);
-
+	$link = connectDb()->fetchRow('SELECT * FROM link WHERE status != :status1 and status != :status2 and type = :type LIMIT 1',[':status1' => 'crawled', ':status2' => 'error-crawled', ':type' => 'product']);
+	
 	if (empty($link) === false) {
 		parsingLink($link);
 	}else{
@@ -34,10 +34,10 @@ function parsingLink($link)
 	info('Parsing url: '.$link['url']);
 	$client = new CurlClient();
 	$content = $client->parsePage($link['url']);
-	var_dump($content);
-	die;
+
 	if (empty($content)) {
 		error('Content is null');
+		changeStatusLink($link,'error-crawled');	
 		return;
 	}
 
@@ -47,7 +47,7 @@ function parsingLink($link)
 		//$colection = collectionLink($client, $content, $link['url']);
 		parsePropertyProduct($client, $content, $link);
 	}
-	changeStatusLink($link);
+	changeStatusLink($link,'crawled');
 	
 }
 
@@ -344,13 +344,13 @@ function saveProperty($properties,$pid,$propid)
 	}
 }
 
-function changeStatusLink($link)
+function changeStatusLink($link,$status)
 {
 	$condr = [
 		'id' => $link['id'],		
 	];
 	$data = [
-		'status' => 'crawled',
+		'status' => $status,
 	];
 	updateTable('link', $condr, $data);
 	info($link['url'].' is crawled');
