@@ -36,7 +36,8 @@ function parsingLink($link)
 
 	if (empty($content)) {
 		error('Content is null');
-		//return;
+		changeStatusLink($link,'error-parsed');
+		return;
 	}
 	
 	if (parse_url($link['url'])['host'] === 'thelabels.ulmart.ru') {
@@ -49,7 +50,7 @@ function parsingLink($link)
 	
 	
 
-	changeStatusLink($link);
+	changeStatusLink($link,'parsed');
 	
 	
 }
@@ -223,14 +224,14 @@ function saveCatalog($client, $content, $link)
 	//die;
 }
 
-function changeStatusLink($link)
+function changeStatusLink($link,$status)
 {
 	if ($link['status'] === 'wating') {
 		$condr = [
 			'id' => $link['id'],		
 		];
 		$data = [
-			'status' => 'parsed',
+			'status' => $status,
 		];
 		updateTable('link', $condr, $data);
 		
