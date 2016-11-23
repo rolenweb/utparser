@@ -81,8 +81,6 @@ function collectionLink($client, $content, $url)
 	}
 
 	$links_product = $client->parseProperty($content,'link','a.js-gtm-product-click',$url,null);
-	var_dump($links_product);
-	die;
 	if (empty($links_product) === false) {
 		info('Found '.count($links_product) .' links for product');
 		foreach ($links_product as $link) {
