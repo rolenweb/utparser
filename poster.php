@@ -234,7 +234,11 @@ function createDescription($properties)
 				break;
 		}
 	}
-	$out = '<div class = "description">'.$description.'</div>';
+	$out = '';
+	if (empty($description) === false) {
+		$out = '<div class = "description">'.$description.'</div>';
+	}
+	
 	if (empty($properties['property']) === false) {
 		$out .= '<table class = "property"><tbody>';
 		foreach ($properties['property'] as $property) {
