@@ -106,6 +106,15 @@ class ProductController extends Controller
                             ]);
                         break;
 
+                    case 'otherimage':
+                        array_push($attributes,
+                            [
+                                'label' => 'Other image',
+                                'format' => 'raw',
+                                'value' => Html::img($property->value),
+                            ]);
+                        break;
+
                     case 'smallimage':
                         array_push($attributes,
                             [

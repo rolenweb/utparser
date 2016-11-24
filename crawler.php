@@ -258,9 +258,15 @@ function parsePropertyProduct($client, $content, $link)
 						saveProperty($currency,$product[0],$property['id']);
 						break;
 
+					
 					case 'bigimage':
 						$bigimage = $client->parseProperty($content,'attribute',$property['value'],null,'src');
 						saveProperty($bigimage,$product[0],$property['id']);
+						break;
+
+					case 'otherimage':
+						$otherimage = $client->parseProperty($content,'link',$property['value'],$link['url'],null);
+						saveProperty($otherimage,$product[0],$property['id']);
 						break;
 
 					case 'smallimage':

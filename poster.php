@@ -48,7 +48,7 @@ for (;;){
 		error('There are not product for posting');
 		die;
 	}
-	//die;
+	
 }
 
 function saveProduct($woocommerce,$product,$pid)
@@ -203,7 +203,8 @@ function createData($properties,$product,$cid)
 	foreach ($properties['data'] as $item) {
 		switch ($item['title']) {
 			case 'description':
-				$out['description'] = trim($item['value']);
+				$out['short_description'] = trim($item['value']);
+				$out['description'] = createDescription($properties,$out['short_description']);
 				break;
 			case 'price':
 				$out['regular_price'] = trim($item['value']);
@@ -217,6 +218,19 @@ function createData($properties,$product,$cid)
 				];
 				break;
 		}
+	}
+	return $out;
+}
+
+function createDescription($properties,$description)
+{
+	$out = '<div class = "description">'.$description.'</div>';
+	if (empty($properties['property']) === false) {
+		$out .= '<table class = "property"><tbody>';
+		foreach ($properties['property'] as $property) {
+			$out.= '<tr><td>'.$property['name'].'</td><td>'.$property['value'].'</td></tr>';
+		}
+		$out .= '</tbody></table>';
 	}
 	return $out;
 }
