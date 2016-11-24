@@ -204,7 +204,6 @@ function createData($properties,$product,$cid)
 		switch ($item['title']) {
 			case 'description':
 				$out['short_description'] = trim($item['value']);
-				$out['description'] = createDescription($properties,$out['short_description']);
 				break;
 			case 'price':
 				$out['regular_price'] = trim($item['value']);
@@ -219,11 +218,22 @@ function createData($properties,$product,$cid)
 				break;
 		}
 	}
+
+	if (empty($properties['property']) === false) {
+		$out['description'] = createDescription($properties);
+	}
 	return $out;
 }
 
-function createDescription($properties,$description)
+function createDescription($properties)
 {
+	foreach ($properties['data'] as $item) {
+		switch ($item['title']) {
+			case 'description':
+				$description = trim($item['value']);
+				break;
+		}
+	}
 	$out = '<div class = "description">'.$description.'</div>';
 	if (empty($properties['property']) === false) {
 		$out .= '<table class = "property"><tbody>';
