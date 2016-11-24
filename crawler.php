@@ -54,29 +54,6 @@ function parsingLink($link)
 function collectionLink($client, $content, $url)
 {
 	info('The collection of links on the page: '.$url);
-	$links_catalog = $client->parseProperty($content,'link','a.js-gtm-click-menu',$url,null);
-	/*if (empty($links_catalog) === false) {
-		info('Found '.count($links_catalog) .' links for catalog');
-		foreach ($links_catalog as $link) {
-			if (connectDb()->fetchColumn('SELECT id FROM link WHERE url = :url and type = :catalog', array('url' => trim($link),'catalog' => 'catalog')) === null)
-			{
-				$data[0] = [
-					'url' => $link,
-					'type' => 'catalog',
-					'created_at' => time(),
-					'updated_at' => time(),
-				];
-				insertTable('link',$data);
-				info($link. ' is saved');
-			}else{
-				//info($link. ' is already saving');
-			}
-		}
-		
-	}else{
-		error('There are not link for catalog');
-	}
-	*/
 	$links_product = $client->parseProperty($content,'link','a.js-gtm-product-click',$url,null);
 	if (empty($links_product) === false) {
 		info('Found '.count($links_product) .' links for product');
@@ -103,7 +80,6 @@ function collectionLink($client, $content, $url)
 		error('There are not link for product');
 	}
 	return [
-		'catalog' => $links_catalog,
 		'product' => $links_product,
 	];
 	
@@ -223,8 +199,10 @@ function parsePropertyProduct($client, $content, $link)
 {
 
 	$catalog = saveCatalog($client, $content, $link);
-
-	collectionLink($client, $content, $link['url']);
+	if (CRAWLERMODE === 'full') {
+		collectionLink($client, $content, $link['url']);
+	}
+	
 
 	if (empty($catalog[0])) {
 		error('Catalog id is not found');
@@ -391,6 +369,8 @@ function success($string)
 
 function info($string)
 {
-	echo "\033[33m".$string."\033[0m".PHP_EOL;
+	if (MODE === 'test') {
+		echo "\033[33m".$string."\033[0m".PHP_EOL;
+	}
 }
 ?>

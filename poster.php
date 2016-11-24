@@ -409,6 +409,8 @@ function success($string)
 
 function info($string)
 {
-	echo "\033[33m".$string."\033[0m".PHP_EOL;
+	if (MODE === 'test') {
+		echo "\033[33m".$string."\033[0m".PHP_EOL;
+	}
 }
 ?>
