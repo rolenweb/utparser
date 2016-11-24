@@ -12,6 +12,8 @@ CREATE TABLE `link` (
 
 CREATE INDEX url_type ON link(url, type);
 
+INSERT INTO `link` (`id`, `url`, `type`, `status`, `created_at`, `updated_at`) VALUES (NULL, 'https://www.ulmart.ru/', 'catalog', 'wating', NULL, NULL);
+
 CREATE TABLE `catalog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `url` varchar(255) DEFAULT NULL,
